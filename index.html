@@ -5,69 +5,59 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>HFT Pro Terminal | Microsoft Architecture</title>
     <style>
-        body { margin: 0; padding: 0; background: #131722; color: #d1d4dc; font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; }
+        body { margin: 0; padding: 0; background: #131722; color: #d1d4dc; font-family: 'Segoe UI', sans-serif; overflow: hidden; }
         
         /* HEADER */
-        .header { background: #1e222d; padding: 10px 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #2a2e39; }
-        .logo { color: #0078d4; font-weight: 700; font-size: 16px; letter-spacing: 0.5px; }
-        .status { color: #00ff00; font-size: 11px; display: flex; align-items: center; font-weight: 500; }
+        .header { height: 50px; background: #1e222d; padding: 0 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #2a2e39; }
+        .logo { color: #f0b90b; font-weight: 700; font-size: 16px; letter-spacing: 1px; }
+        .status { color: #00ff00; font-size: 11px; display: flex; align-items: center; }
         .status::before { content: ''; width: 6px; height: 6px; background: #00ff00; border-radius: 50%; margin-right: 6px; box-shadow: 0 0 5px #00ff00; }
 
         /* BỐ CỤC CHÍNH */
         .main-container { display: flex; height: calc(100vh - 50px); }
 
-        /* CỘT QUẢNG CÁO (Đã tối ưu hóa hiển thị) */
+        /* 1. CỘT QUẢNG CÁO DỌC (ADSTERRA 160x600) */
         .ads-sidebar {
-            width: 170px; /* Rộng hơn banner 160px chút cho thoáng */
-            background: #1a1d27; /* Màu nền tối hơn chút để nổi QC */
-            border-right: 1px solid #2a2e39;
-            padding: 10px 0;
-            display: flex;
-            justify-content: center; /* Căn giữa ngang */
-            align-items: flex-start; /* PC thì căn lên trên */
+            width: 170px; background: #1a1d27; border-right: 1px solid #2a2e39;
+            padding: 10px 0; display: flex; justify-content: center; align-items: flex-start;
             overflow: hidden;
         }
         
         /* KHU VỰC BIỂU ĐỒ */
-        .chart-area { flex-grow: 1; padding: 0; position: relative; background: #131722; }
+        .chart-area { flex-grow: 1; display: flex; flex-direction: column; background: #131722; position: relative; }
         
-        /* THANH CÔNG CỤ DƯỚI (Affiliate) */
-        .tools-bar { height: 90px; background: #1e222d; border-top: 1px solid #2a2e39; display: flex; align-items: center; justify-content: space-around; padding: 0 15px; }
-        .product-item { text-align: center; cursor: pointer; transition: all 0.3s ease; }
-        .product-item:hover { transform: translateY(-3px); }
-        .product-img { width: 36px; height: 36px; background: linear-gradient(145deg, #2a2e39, #1e222d); margin: 0 auto 6px; border-radius: 8px; display:flex; align-items:center; justify-content:center; font-size: 18px; box-shadow: 3px 3px 6px #151820, -3px -3px 6px #272c3a; }
-        .product-title { font-size: 11px; margin-bottom: 6px; color: #b2b5be; }
-        .btn-buy { background: #f0b90b; color: #000; padding: 4px 12px; text-decoration: none; font-size: 11px; font-weight: 700; border-radius: 4px; display: inline-block; }
-        .btn-buy:hover { background: #ffc800; }
+        /* 2. THANH QUẢNG CÁO NGANG (A-ADS 728x90) */
+        .crypto-ad-banner {
+            background: #000; padding: 5px; border-bottom: 1px solid #2a2e39;
+            display: flex; justify-content: center; align-items: center;
+            overflow: hidden; /* Cắt phần thừa nếu quá dài */
+        }
+        /* Fix lỗi tràn màn hình trên mobile cho A-ADS */
+        .crypto-ad-banner iframe { max-width: 100%; }
 
-        /* NÚT KÊU GỌI HÀNH ĐỘNG (Góc trên biểu đồ) */
-        .cta-overlay { position: absolute; top: 12px; right: 12px; z-index: 10; }
-        .btn-register { background: #0078d4; color: white; padding: 8px 16px; text-decoration: none; border-radius: 4px; font-size: 13px; font-weight: 700; box-shadow: 0 4px 12px rgba(0,120,212,0.4); transition: all 0.2s; }
-        .btn-register:hover { background: #0066b8; transform: scale(1.02); }
+        /* KHUNG CHART TRADINGVIEW */
+        .chart-widget { flex-grow: 1; position: relative; width: 100%; }
 
-        /* --- MOBILE RESPONSIVE --- */
+        /* NÚT KÊU GỌI HÀNH ĐỘNG (BẪY CLICK) */
+        .cta-overlay { position: absolute; top: 10px; right: 10px; z-index: 10; }
+        .btn-register { background: #0078d4; color: white; padding: 8px 16px; text-decoration: none; border-radius: 4px; font-size: 12px; font-weight: 700; box-shadow: 0 4px 12px rgba(0,120,212,0.4); animation: pulse 2s infinite; }
+        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
+
+        /* MOBILE RESPONSIVE */
         @media (max-width: 768px) {
-            .main-container { flex-direction: column; height: auto; }
-            .ads-sidebar {
-                width: 100%;
-                height: auto;
-                padding: 20px 0; /* Tăng khoảng cách trên mobile */
-                border-right: none;
-                border-bottom: 1px solid #2a2e39;
-                align-items: center; /* Mobile căn giữa hoàn toàn */
-                background: #151821; /* Nền tối hơn nữa trên mobile */
-            }
-            .chart-area { height: 450px; } /* Tăng chiều cao biểu đồ trên mobile */
-            .cta-overlay { top: 8px; right: 8px; }
-            .btn-register { padding: 6px 12px; font-size: 11px; }
+            .main-container { flex-direction: column; height: auto; overflow-y: auto; }
+            .ads-sidebar { display: none; } /* Ẩn cột dọc trên mobile cho đỡ rối */
+            .chart-area { height: 100vh; }
+            .crypto-ad-banner { height: auto; padding: 0; }
+            .crypto-ad-banner iframe { transform: scale(0.5); transform-origin: top center; margin-bottom: -45px; } /* Thu nhỏ A-ADS trên mobile */
         }
     </style>
 </head>
 <body>
 
     <div class="header">
-        <div class="logo">HFT ARCHITECT V3.5</div>
-        <div class="status">System Online: Stable</div>
+        <div class="logo">BINANCE PARTNER HUB</div>
+        <div class="status">Live Feed: Connected</div>
     </div>
 
     <div class="main-container">
@@ -83,50 +73,56 @@
                 };
             </script>
             <script type="text/javascript" src="//www.highperformanceformat.com/ed6679df373e644cb76650d0ce7eca81/invoke.js"></script>
-            </div>
+        </div>
 
         <div class="chart-area">
-            <div class="cta-overlay">
-                <a href="#" class="btn-register" target="_blank">⚡ ACTIVATE VIP ACCESS</a>
+            
+            <div class="crypto-ad-banner">
+                <div id="frame" style="width: 728px;margin: auto;z-index: 99998;height: auto">
+                    <iframe data-aa='2422850' src='//ad.a-ads.com/2422850/?size=728x90' 
+                    style='border:0; padding:0; width:728px; height:90px; overflow:hidden;display: block;margin: auto'></iframe>
+                </div>
             </div>
 
-            <div class="tradingview-widget-container" style="height:100%;width:100%">
-                <div class="tradingview-widget-container__widget" style="height:calc(100% - 32px);width:100%"></div>
-                <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js" async>
-                {
-                "autosize": true,
-                "symbol": "BINANCE:BTCUSDT",
-                "interval": "1",
-                "timezone": "Etc/UTC",
-                "theme": "dark",
-                "style": "1",
-                "locale": "en",
-                "enable_publishing": false,
-                "hide_top_toolbar": false,
-                "hide_legend": true,
-                "save_image": false,
-                "hide_volume": true,
-                "support_host": "https://www.tradingview.com"
-                }
-                </script>
+            <div class="chart-widget">
+                <div class="cta-overlay">
+                    <a href="#" class="btn-register" id="btnVip">⚡ ACTIVATE VIP ACC</a>
+                </div>
+
+                <div class="tradingview-widget-container" style="height:100%;width:100%">
+                    <div class="tradingview-widget-container__widget" style="height:calc(100% - 32px);width:100%"></div>
+                    <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js" async>
+                    {
+                    "autosize": true,
+                    "symbol": "BINANCE:BTCUSDT",
+                    "interval": "1",
+                    "timezone": "Etc/UTC",
+                    "theme": "dark",
+                    "style": "1",
+                    "locale": "en",
+                    "hide_top_toolbar": false,
+                    "hide_legend": true,
+                    "hide_volume": true,
+                    "support_host": "https://www.tradingview.com"
+                    }
+                    </script>
+                </div>
             </div>
         </div>
-
     </div>
 
-    <div class="tools-bar">
-        <div class="product-item">
-            <div class="product-img">🤖</div>
-            <div class="product-title">Bot Signal AI</div>
-            <a href="#" class="btn-buy">Thuê ngay</a>
-        </div>
+    <script>
+        // KHO LINK KIẾM TIỀN (Boss thay link vào đây)
+        const LINKS = [
+            "https://publishers.monetag.com/direct-link/...", // Link Monetag
+            "https://shopee.vn/universal-link/..."            // Link Shopee
+        ];
 
-        <div class="product-item">
-            <div class="product-img">🛡️</div>
-            <div class="product-title">Bảo hiểm vốn</div>
-            <a href="#" class="btn-buy">Xem gói</a>
-        </div>
-    </div>
+        document.getElementById('btnVip').addEventListener('click', function() {
+            const random = LINKS[Math.floor(Math.random() * LINKS.length)];
+            window.open(random, '_blank');
+        });
+    </script>
 
 </body>
 </html>
